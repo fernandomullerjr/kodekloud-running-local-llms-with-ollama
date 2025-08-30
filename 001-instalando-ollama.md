@@ -214,3 +214,12 @@ Created symlink /etc/systemd/system/default.target.wants/ollama.service → /etc
 NAME    ID    SIZE    PROCESSOR    UNTIL
 > date
 Sat Aug 30 19:37:51 -03 2025
+
+
+
+ollama run deepseek-r1
+
+
+> ollama run deepseek-r1
+pulling manifest
+pulling e6a7edc1a4d7...   0% ▕                                                        ▏  11 MB/5.2 GB  1.4 MB/s    1h2m
