@@ -213,6 +213,176 @@ ip
 
 
 
+- TSHOOT: OpenWebUi não mostra modelo algum, mesmo com Ollama rodando. Revisar o comando Docker e analisar o que pode estar ocorrendo.
+
+
+- Teste a API a partir do container do Open WebUI:
+> docker exec -it open-webui sh -c \
+"apk add --no-cache curl >/dev/null 2>&1 || true; curl -sS http://host.docker.internal:11434/api/tags"
+
+curl: (7) Failed to connect to host.docker.internal port 11434 after 0 ms: Couldn't connect to server
+
+ ~                        
+
+
+
+- ANTES
+> ss -ltnp | grep 11434
+LISTEN 0      4096       127.0.0.1:11434      0.0.0.0:*
+
+ ~        
+
+
+
+
+Valeu pelo teste — o erro confirma que o container **não consegue** alcançar o servidor do Ollama no host. Na prática, isso quase sempre é porque o Ollama está ouvindo **só em 127.0.0.1** (loopback). De dentro do container, “localhost” é o container, não o host.
+
+Vamos corrigir em 3 passos rápidos:
+
+---
+
+## 1) Faça o Ollama ouvir em todas as interfaces
+
+No WSL2, pare o Ollama (se estiver rodando) e suba ouvindo em `0.0.0.0`:
+
+```bash
+# se estiver rodando em primeiro plano:
+pkill -f "ollama serve" 2>/dev/null || true
+
+# iniciar ouvindo em todas as interfaces
+OLLAMA_HOST=0.0.0.0 ollama serve
+```
+
+Se você usa systemd:
+
+```bash
+sudo mkdir -p /etc/systemd/system/ollama.service.d
+printf "[Service]\nEnvironment=OLLAMA_HOST=0.0.0.0\n" | \
+  sudo tee /etc/systemd/system/ollama.service.d/override.conf
+
+sudo systemctl daemon-reload
+sudo systemctl restart ollama
+```
+
+✅ Verifique:
+
+```bash
+ss -ltnp | grep 11434     # deve aparecer 0.0.0.0:11434 LISTEN
+curl -s http://localhost:11434/api/tags
+```
+
+---
+
+## 2) Garanta o atalho do host no container
+
+Recrie o Open WebUI com o mapeamento do “host-gateway” e a URL certa:
+
+```bash
+docker rm -f open-webui 2>/dev/null
+
+docker run -d \
+  -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
+```
+
+> Na UI (Settings → Connections), confirme que o **Base URL** do Ollama está em
+> `http://host.docker.internal:11434`.
+
+---
+
+## 3) Teste de dentro do container
+
+Agora deve responder:
+
+```bash
+docker exec -it open-webui sh -c \
+"apk add --no-cache curl >/dev/null 2>&1 || true; curl -sS http://host.docker.internal:11434/api/tags"
+```
+
+Se devolver JSON com os modelos, a UI passa a listá-los imediatamente.
+
+---
+
+### Plano B (se ainda falhar)
+
+Use o IP do WSL (em vez de `host.docker.internal`):
+
+1. Descubra o IP do WSL:
+
+```bash
+ip -4 addr show eth0 | awk '/inet /{print $2}' | cut -d/ -f1
+# exemplo: 172.27.208.1
+```
+
+2. Recrie o WebUI apontando para esse IP:
+
+```bash
+docker rm -f open-webui 2>/dev/null
+docker run -d \
+  -p 3000:8080 \
+  -e OLLAMA_BASE_URL=http://<IP_DO_WSL>:11434 \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
+```
+
+---
+
+Se quiser, me manda a saída de:
+
+* `ss -ltnp | grep 11434`
+* o resultado do **teste no container** (curl)
+
+que eu ajusto exatamente no seu ambiente.
+
+
+
+
+
+- Ajustando:
+
+> sudo mkdir -p /etc/systemd/system/ollama.service.d
+> printf "[Service]\nEnvironment=OLLAMA_HOST=0.0.0.0\n" | \
+  sudo tee /etc/systemd/system/ollama.service.d/override.conf
+[Service]
+Environment=OLLAMA_HOST=0.0.0.0
+> sudo systemctl daemon-reload
+> sudo systemctl restart ollama
+> ss -ltnp | grep 11434
+LISTEN 0      4096               *:11434            *:*
+>
+> curl -s http://localhost:11434/api/tags
+{"models":[{"name":"deepseek-r1:latest","model":"deepseek-r1:latest","modified_at":"2025-08-30T19:51:59.925509075-03:00","size":5225376047,"digest":"6995872bfe4c521a67b32da386cd21d5c6e819b6e0d62f79f64ec83be99f5763","details":{"parent_model":"","format":"gguf","family":"qwen3","families":["qwen3"],"parameter_size":"8.2B","quantization_level":"Q4_K_M"}}]}%    > docker rm -f open-webui 2>/dev/null
+open-webui
+> docker run -d \
+  -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -e OLLAMA_BASE_URL=http://host.docker.internal:11434 \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
+dde7a808085163a0680de9bcf9495927334728320258c66faf0f5fb018a919f1
+> docker exec -it open-webui sh -c \
+"apk add --no-cache curl >/dev/null 2>&1 || true; curl -sS http://host.docker.internal:11434/api/tags"
+
+{"models":[{"name":"deepseek-r1:latest","model":"deepseek-r1:latest","modified_at":"2025-08-30T19:51:59.925509075-03:00","size":5225376047,"digest":"6995872bfe4c521a67b32da386cd21d5c6e819b6e0d62f79f64ec83be99f5763","details":{"parent_model":"","format":"gguf","family":"qwen3","families":["qwen3"],"parameter_size":"8.2B","quantization_level":"Q4_K_M"}}]}%    >
+> DATE
+zsh: command not found: DATE
+> date
+Sun Aug 31 15:39:11 -03 2025
+
+ ~                                                                                                        ok  15:39:11
+
+
+
+
 
 
 ## PENDENTE
