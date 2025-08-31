@@ -47,9 +47,12 @@ Os parâmetros controlam **como o modelo gera texto** e **quais recursos são us
 
 > No Ollama, você pode definir parâmetros no comando `ollama run` ou em um **Modelfile**.
 
+**Exemplo:**
+Se você pedir uma receita e colocar `temperature` alto, o modelo pode inventar pratos criativos. Com `temperature` baixo, ele vai te dar a receita mais comum.
+
 ---
 
-## 3. Weights in LLM
+## 3. Weights in LLM -  Weights (Pesos) — O “Conhecimento Gravado”
 
 Os **weights** (pesos) são os valores numéricos aprendidos durante o **treinamento** do modelo.
 
@@ -57,6 +60,15 @@ Os **weights** (pesos) são os valores numéricos aprendidos durante o **treinam
 * Estão distribuídos em milhões ou bilhões de parâmetros.
 * Pesos treinados definem **o conhecimento do modelo** — alterar pesos exige **treinamento ou fine-tuning**.
 * No Ollama, os weights vêm empacotados no arquivo do modelo (`.bin`, `.gguf`).
+
+Os **weights** são como **livros e receitas** guardados na estante da cozinha:
+
+* Cada peso é um número que representa algo que o modelo aprendeu.
+* Durante o treinamento, o modelo “escreve” esses números na memória.
+* Mais parâmetros (pesos) = mais conhecimento, mas também mais espaço e processamento.
+
+**Exemplo:**
+Um chef experiente (modelo grande) tem milhares de receitas memorizadas. Um chef iniciante (modelo pequeno) sabe menos receitas, mas cozinha mais rápido.
 
 ---
 
@@ -80,6 +92,20 @@ Treinar um LLM envolve várias etapas:
 
 > No contexto do **Ollama**, você normalmente não treina do zero — utiliza modelos já treinados e, se necessário, faz fine-tuning ou adapta via Modelfiles.
 
+Treinar um modelo é como **ensinar um chef**:
+
+1. **Pré-treinamento**:
+   O chef lê milhares de receitas de diferentes tipos.
+
+2. **Fine-tuning**:
+   Depois, ele faz um curso especializado (por exemplo, só comida japonesa).
+
+3. **Alinhamento**:
+   Ele aprende a conversar de forma educada e seguir regras (RLHF — “feedback humano”).
+
+**Exemplo:**
+No Ollama, você normalmente baixa um chef já treinado (modelo pronto) e só ajusta como ele trabalha (parâmetros).
+
 ---
 
 ## 5. Context Length
@@ -95,7 +121,7 @@ O **comprimento de contexto** (context length ou `num_ctx`) é a quantidade de t
 
 ---
 
-## 6. Embedding Length
+## 6. Embedding Length — “O DNA das Palavras”
 
 O **embedding length** (dimensão do embedding) é o tamanho do vetor numérico usado para representar cada token.
 
@@ -106,9 +132,18 @@ O **embedding length** (dimensão do embedding) é o tamanho do vetor numérico 
   * **Uso de memória** → vetores maiores ocupam mais espaço.
 * É definido pela arquitetura do modelo e **não pode ser alterado** sem re-treinamento.
 
+O **embedding length** é como o **código genético** das palavras:
+
+* Cada palavra é transformada em um vetor (lista de números).
+* O tamanho desse vetor é o **embedding length**.
+* Vetores maiores guardam mais detalhes, mas ocupam mais espaço.
+
+**Exemplo:**
+Se você descreve uma maçã com apenas 3 palavras (“vermelha, doce, redonda”), a informação é limitada. Com 50 palavras, você descreve muito melhor.
+
 ---
 
-## 7. Quantization (Quantização)
+## 7. Quantization (Quantização) — “Comprimir para Caber”
 
 A **quantização** reduz a precisão numérica dos pesos para economizar memória e acelerar a execução.
 
@@ -123,22 +158,29 @@ A **quantização** reduz a precisão numérica dos pesos para economizar memór
   * Modelos grandes podem rodar em hardware mais fraco.
 * No Ollama, modelos `.gguf` já podem vir quantizados (`Q4_0`, `Q5_K_M` etc.).
 
----
+A **quantização** é como **reduzir a resolução de uma foto**:
 
-## 8. Resumo Visual
+* Mantém a ideia geral, mas ocupa menos espaço.
+* Troca números grandes (ex.: 32 bits) por menores (ex.: 8 ou 4 bits).
+* Ganha velocidade e economiza memória, com pequena perda de qualidade.
 
-| Conceito         | Explicação                                                                     |
-| ---------------- | ------------------------------------------------------------------------------ |
-| Arquitetura      | Estrutura do modelo (transformer, número de camadas, cabeças de atenção etc.). |
-| Parâmetros       | Ajustes no comportamento da geração de texto.                                  |
-| Weights          | Pesos aprendidos no treinamento, representam o conhecimento do modelo.         |
-| Treinamento      | Processo de pré-treinamento, fine-tuning e alinhamento.                        |
-| Context Length   | Quantos tokens o modelo "lembra" por vez.                                      |
-| Embedding Length | Dimensão do vetor que representa cada token.                                   |
-| Quantization     | Redução da precisão para economizar recursos.                                  |
+**Exemplo:**
+Foto em **4K** (modelo FP32) → ocupa muito espaço e é super nítida.
+Foto em **HD** (modelo INT8) → ocupa menos espaço e ainda é boa.
+Foto muito comprimida (INT4) → super leve, mas perde detalhes.
 
 ---
 
-Se você quiser, eu posso transformar esse conteúdo em um **slide deck (PPTX)** com diagramas de arquitetura, exemplos visuais de embeddings e comparativos de quantização, para deixar o módulo do curso mais didático.
+## 8. Resumo com Analogias
 
-Quer que eu já prepare essa versão visual?
+| Conceito         | Analogia                  | Papel no LLM                                |
+| ---------------- | ------------------------- | ------------------------------------------- |
+| Arquitetura      | Projeto da casa           | Define a estrutura do modelo                |
+| Parâmetros       | Configuração do forno     | Controlam como ele responde                 |
+| Weights          | Livros de receitas        | Conhecimento aprendido                      |
+| Treinamento      | Curso do chef             | Ensina o modelo a agir                      |
+| Context Length   | Memória de curto prazo    | Quantidade de informação lembrada           |
+| Embedding Length | DNA das palavras          | Como palavras são representadas             |
+| Quantization     | Reduzir resolução da foto | Menos recursos, possível perda de qualidade |
+
+---
