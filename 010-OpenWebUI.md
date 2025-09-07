@@ -389,9 +389,23 @@ Sun Aug 31 15:39:11 -03 2025
 - TSHOOT: OpenWebUi não mostra modelo algum, mesmo com Ollama rodando. Revisar o comando Docker e analisar o que pode estar ocorrendo.
 
 
+
+
+## Dia 06/09/2025
+
+- TSHOOT: OpenWebUi não mostra modelo algum, mesmo com Ollama rodando. Revisar o comando Docker e analisar o que pode estar ocorrendo.
+
+- Testando
+192.168.1.88:3000
+
+- OK
+acessando e com o Modelo na GUI
+
+
+
 ## RESUMO
 
-## 🐳 Comando para WSL2 (Docker)
+## 🐳 Comando para WSL2 (Docker), para subir o OpenWebUi:
 
 ```bash
 docker run -d \
