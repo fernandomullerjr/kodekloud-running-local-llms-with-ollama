@@ -427,3 +427,10 @@ curl -X POST http://localhost:11434/api/generate \
 
     Testar deepseek de 70B. Utilizar o JQ para formatar o JSON.
 
+
+
+
+> ollama run deepseek-r1:70b "me mostre um codigo em python que comunica com api do ollama"
+Error: 500 Internal Server Error: model requires more system memory (35.6 GiB) than is available (11.4 GiB)
+
+ ~              

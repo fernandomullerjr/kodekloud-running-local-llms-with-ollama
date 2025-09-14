@@ -2,6 +2,10 @@ import os
 import json
 import requests
 from flask import Flask, request, render_template_string, redirect, url_for, flash
+from dotenv import load_dotenv  # pip install python-dotenv
+
+# Carrega variáveis do .env
+load_dotenv()
 
 # ----------------------------
 # Config via variáveis de ambiente

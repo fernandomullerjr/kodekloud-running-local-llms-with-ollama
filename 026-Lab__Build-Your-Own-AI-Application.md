@@ -389,3 +389,10 @@ http://192.168.1.109:8080/
 
 Erro HTTP ao chamar ollama: 404 - {"error":"model 'qwen:0.5b' not found"}
 
+
+
+
+> ollama run deepseek-r1:70b "me mostre um codigo em python que comunica com api do ollama"
+Error: 500 Internal Server Error: model requires more system memory (35.6 GiB) than is available (11.4 GiB)
+
+ ~              
