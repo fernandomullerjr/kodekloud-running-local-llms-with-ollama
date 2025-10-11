@@ -13,6 +13,8 @@ docker run -d \
 
 # Acesso via ip 192.168.1.62:
 http://192.168.1.62:3000/auth?redirect=%2F
+ou no WSL:
+http://localhost:3000
 
 
 

@@ -400,3 +400,29 @@ Error: 500 Internal Server Error: model requires more system memory (35.6 GiB) t
 
 ## PENDENTE
 - Testar DeepSeek de menos Billions.
+
+
+
+
+## Dia 11/10/2025
+
+- Testar DeepSeek de menos Billions.
+
+- Testando com modelo: deepseek-r1:latest
+
+> python app.py
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://192.168.1.83:8080
+Press CTRL+C to quit
+127.0.0.1 - - [11/Oct/2025 20:17:55] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [11/Oct/2025 20:17:56] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [11/Oct/2025 20:18:42] "POST / HTTP/1.1" 200 -
+
+
+- Via browser:
+http://localhost:8080/
+gerou o Poema!
