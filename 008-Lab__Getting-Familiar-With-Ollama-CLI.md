@@ -215,3 +215,21 @@ duckyblender/danube3:0.5b    13292586951b    317 MB    5 minutes ago
 ai-engineer@ollama-server-1756661287:~$ date
 Sun Aug 31 17:37:14 UTC 2025
 ai-engineer@ollama-server-1756661287:~$ 
+
+
+
+9 / 9
+
+Ollama Labs
+
+Stop all running models on the ollama-server.
+
+Have all the models stopped?
+
+
+ai-engineer@ollama-server-1756661287:~$ ollama stop duckyblender/danube3:0.5b
+ai-engineer@ollama-server-1756661287:~$ ollama stop qwen:0.5b
+ai-engineer@ollama-server-1756661287:~$ 
+ai-engineer@ollama-server-1756661287:~$ ollama ps
+NAME    ID    SIZE    PROCESSOR    CONTEXT    UNTIL 
+ai-engineer@ollama-server-1756661287:~$ 

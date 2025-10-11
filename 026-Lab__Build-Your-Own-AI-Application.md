@@ -396,3 +396,7 @@ Erro HTTP ao chamar ollama: 404 - {"error":"model 'qwen:0.5b' not found"}
 Error: 500 Internal Server Error: model requires more system memory (35.6 GiB) than is available (11.4 GiB)
 
  ~              
+
+
+## PENDENTE
+- Testar DeepSeek de menos Billions.

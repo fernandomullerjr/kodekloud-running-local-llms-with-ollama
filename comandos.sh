@@ -25,3 +25,14 @@ curl -X POST http://localhost:11434/api/generate \
     "prompt": "Explique o que é aprendizado de máquina.",
     "stream": false
   }'
+
+
+
+curl -X POST http://localhost:11434/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-r1:latest",
+    "prompt": "Explique COMO FAZER UMA PESQUISA NO GOOGLE.",
+    "stream": false
+  }' | jq .
+  
