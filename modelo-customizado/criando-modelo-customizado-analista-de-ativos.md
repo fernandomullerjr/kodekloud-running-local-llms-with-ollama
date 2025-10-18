@@ -573,3 +573,108 @@ creating new layer sha256:846f6ee8cf2c24d89e566964df738b9f28202cd5bfa6cec1f0cc92
 creating new layer sha256:619e1959902b73a513da9f715b9740056499aa57e5f75b5a87f419726aa0dced
 writing manifest
 success
+
+
+
+
+- Resultado fraco:
+NÃO TRAZ INDICADORES, NEM DE EXEMPLO
+DADOS GENÉRICOS DEMAIS.
+
+
+> ollama run analista-fundamentalista-gemma
+>>> PETR4
+**Riscos e Oportunidades**
+
+##  PETR4 - Petrobras (Petróleo Brasileiro S.A.)
+
+**Resumo do Ativo:**
+
+Petrobras é a maior empresa brasileira de petróleo e gás natural, com operações em exploração, produção, refino,
+transporte, comercialização e distribuição de combustíveis. A empresa possui ativos em diversos países, incluindo
+Brasil, Estados Unidos, Argentina, Chile, Peru e Angola.
+
+**Indicadores Fundamentais:**
+
+* **ROE (Retorno sobre o Patrimônio Líquido):**  - Em análise constante devido à volatilidade do setor.
+* **ROA (Retorno sobre Ativos):** - Em análise constante devido à volatilidade do setor.
+* **P/L (Preço por Lucro):** - Em análise constante devido à volatilidade do setor.
+* **Dividendo:** Petrobras tem histórico de pagamento de dividendos, mas a política pode variar com os resultados
+e cenário econômico.
+
+**Análise Qualitativa:**
+
+* **Vantagens:**
+    * Posição dominante no mercado brasileiro de petróleo e gás natural.
+    * Ampla rede de infraestrutura logística.
+    * Diversidade geográfica de operações.
+    * Investimentos em energias renováveis.
+* **Desvantagens:**
+    * Vulnerabilidade a flutuações nos preços do petróleo.
+    * Regulamentação governamental complexa e política.
+    * Altos custos operacionais.
+    * Histórico de escândalos de corrupção.
+
+**Classificação Final:**
+
+A classificação final depende da tolerância ao risco do investidor e da análise individual dos indicadores e
+fatores mencionados acima.
+
+**Riscos e Oportunidades:**
+
+* **Riscos:**
+    * Flutuações nos preços do petróleo.
+    * Mudanças na política energética brasileira.
+    * Concorrência acirrada no mercado global de petróleo.
+    * Desastres naturais e eventos geopolíticos.
+* **Oportunidades:**
+    * Crescimento da demanda por energia em países emergentes.
+    * Investimentos em tecnologias de produção mais eficientes.
+    * Expansão para novos mercados internacionais.
+    * Transição para energias renováveis.
+
+
+
+**Observações:**
+
+Esta análise é apenas um guia inicial e não deve ser considerada como aconselhamento financeiro profissional. É
+importante realizar pesquisas adicionais e consultar um consultor financeiro antes de tomar
+
+>>> Send a message (/? for help)
+
+
+
+
+
+
+Feito! Montei um **mini-projeto completo** com scraping da Status Invest (Playwright + fallback requests/bs4) e integração com seu **modelo no Ollama**.
+
+**Download:** [statusinvest_toolkit.zip](sandbox:/mnt/data/statusinvest_toolkit.zip)
+
+### O que vem no pacote
+
+* `statusinvest_scrape.py` — scraper **Playwright** (renderiza JS, recomendado).
+* `statusinvest_requests.py` — fallback com **requests + BeautifulSoup**.
+* `run_analise.py` — roda o scraper e passa os dados para seu modelo no **Ollama**.
+* `Modelfile.gemma` — Modelfile para `gemma2:9b` (analista em Markdown).
+* `Modelfile.fingpt` — Modelfile para `.gguf` (FinGPT/Mistral) com saída **JSON**.
+* `requirements.txt`, `Makefile`, `README.md`.
+
+### Como usar (resumo)
+
+```bash
+# 1) Preparar ambiente
+make install
+
+# 2) (Opcional) Criar modelo Gemma
+ollama pull gemma2:9b
+ollama create analista-fundamentalista-gemma -f Modelfile.gemma
+
+# 3) Scraping (Playwright)
+make scrape TICKER=BBAS3
+
+# 4) Analisar com seu modelo
+make analise TICKER=BBAS3 MODEL=analista-fundamentalista-gemma
+```
+
+Se quiser, ajusto os **rótulos** específicos para FIIs (vacância, P/VP, DY 12m, etc.) e adiciono um target `make scrape-fii TICKER=HGLG11`.
