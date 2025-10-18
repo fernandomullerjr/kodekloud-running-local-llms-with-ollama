@@ -288,3 +288,17 @@ checkpoints/
 # Ollama specific
 ollama_models/
 .ollama/
+
+# Playwright específico
+**/playwright/
+playwright-report/
+test-results/
+
+# Environments - mais específico
+**/.venv/
+**/.env
+**/venv/
+**/env/
+
+# Node modules (caso use JS/TS)
+node_modules/
