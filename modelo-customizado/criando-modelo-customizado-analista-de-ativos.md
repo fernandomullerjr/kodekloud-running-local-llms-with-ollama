@@ -249,3 +249,327 @@ Esse tipo de modelo é ideal para:
 * **Estudos educacionais** sobre fundamentos de ativos.
 
 > 💬 “O diferencial não está em treinar um novo modelo, mas em ensinar um modelo existente a pensar como um analista.”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+- Dia 18/10/2025
+
+Perfeito, Fernando 💪
+Vamos montar **dois setups completos**:
+
+1️⃣ **Gemma 2 9B** — modelo geral, excelente para raciocínio analítico e linguagem natural (ideal para uso diário e análise textual).
+2️⃣ **FinGPT** — modelo especializado em finanças, ajustado com vocabulário e lógica financeira.
+
+Você poderá rodar ambos no **Ollama** dentro do **WSL** (Ubuntu 22), alternando conforme a necessidade.
+
+---
+
+# ⚙️ 1. Instalação e configuração do Ollama (se ainda não estiver)
+
+> Pule este passo se já tiver o Ollama instalado.
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+Depois:
+
+```bash
+ollama --version
+```
+
+Se aparecer algo como `ollama version 0.3.x`, está pronto.
+
+---
+
+# 🧠 2. Instalação do **Gemma 2 9B**
+
+A Google lançou o **Gemma 2 9B** com excelente custo/benefício — leve, raciocínio técnico e suporte multilíngue.
+
+### ✅ Passos:
+
+```bash
+ollama pull gemma2:9b
+```
+
+Espere o download (~5 GB).
+
+Teste o modelo:
+
+```bash
+ollama run gemma2:9b
+```
+
+---
+
+## 🧩 Crie o modelo customizado “Analista Fundamentalista – Gemma”
+
+Crie o arquivo:
+
+```bash
+nano Modelfile
+```
+
+Cole:
+
+```bash
+# Modelfile: analista-fundamentalista-gemma
+FROM gemma2:9b
+
+SYSTEM """
+Você é um analista fundamentalista de investimentos.
+Analise ações, FIIs e stocks com base em fundamentos econômicos e financeiros.
+Avalie múltiplos como P/L, P/VP, ROE, DY, endividamento e crescimento.
+Classifique o ativo como 'Alta qualidade', 'Neutra' ou 'Baixa qualidade'.
+Não faça recomendações de compra/venda.
+"""
+
+PARAMETER temperature 0.4
+PARAMETER top_p 0.9
+PARAMETER num_predict 512
+
+TEMPLATE """
+Ativo: {{ .Prompt }}
+
+Responda com a estrutura:
+
+**Resumo do Ativo**
+**Indicadores Fundamentais**
+**Análise Qualitativa**
+**Classificação Final**
+"""
+```
+
+Salve e crie o modelo:
+
+```bash
+ollama create analista-fundamentalista-gemma -f Modelfile
+```
+
+Execute:
+
+```bash
+ollama run analista-fundamentalista-gemma
+```
+
+Teste:
+
+```
+PETR4
+```
+
+ou
+
+```
+HGLG11
+```
+
+---
+
+# 💼 3. Instalação e uso do **FinGPT**
+
+O **FinGPT** é um modelo **finetuned** em relatórios, notícias e balanços financeiros.
+Ele não está no repositório oficial do Ollama, então você precisará **baixar a versão compatível em `.gguf`** e importá-la.
+
+---
+
+## 🧩 A) Baixando o modelo (via Hugging Face)
+
+Acesse o Hugging Face e busque o repositório:
+
+🔗 [https://huggingface.co/FinGPT](https://huggingface.co/FinGPT)
+ou
+🔗 [https://huggingface.co/FinanceAI/finma-7b](https://huggingface.co/FinanceAI/finma-7b)
+
+Baixe o arquivo `.gguf` (ex: `fingpt-mistral-7b.Q4_K_M.gguf`) — ele costuma ter de 4 a 8 GB.
+
+Copie para o diretório do Ollama:
+
+```bash
+sudo mkdir -p /usr/share/ollama/models
+sudo cp fingpt-mistral-7b.Q4_K_M.gguf /usr/share/ollama/models/
+```
+
+---
+
+## 🧩 B) Criando o modelo no Ollama
+
+Crie o arquivo:
+
+```bash
+nano Modelfile
+```
+
+Cole:
+
+```bash
+# Modelfile: analista-fundamentalista-fingpt
+FROM ./fingpt-mistral-7b.Q4_K_M.gguf
+
+SYSTEM """
+Você é um analista financeiro especializado em análise fundamentalista.
+Sua tarefa é avaliar empresas e fundos com base em seus fundamentos e múltiplos.
+Use terminologia financeira correta e linguagem técnica.
+Responda de forma estruturada e objetiva.
+"""
+
+PARAMETER temperature 0.3
+PARAMETER top_p 0.85
+PARAMETER num_predict 600
+
+TEMPLATE """
+Analisar o ativo: {{ .Prompt }}
+
+Responda no formato:
+
+{
+  "ticker": "",
+  "setor": "",
+  "indicadores": {
+    "pl": "",
+    "pvp": "",
+    "roe": "",
+    "dy": "",
+    "endividamento": ""
+  },
+  "analise": {
+    "pontos_fortes": [],
+    "pontos_fracos": [],
+    "qualidade": "Alta | Neutra | Baixa"
+  }
+}
+"""
+```
+
+Salve e crie o modelo:
+
+```bash
+ollama create analista-fundamentalista-fingpt -f Modelfile
+```
+
+Teste:
+
+```bash
+ollama run analista-fundamentalista-fingpt
+```
+
+Prompt:
+
+```
+AAPL — fundamentos e qualidade do ativo
+```
+
+---
+
+# 🧩 4. Comparando os dois modelos
+
+| Critério                  | **Gemma 2 9B**                 | **FinGPT (7B)**                   |
+| ------------------------- | ------------------------------ | --------------------------------- |
+| Domínio de finanças       | Médio (generalista)            | Alto (especializado)              |
+| Linguagem natural (PT/EN) | Excelente                      | Boa (treino mais em inglês)       |
+| Contexto analítico        | Ótimo                          | Excelente em fundamentos          |
+| Tamanho                   | ~5 GB                          | 4–8 GB                            |
+| Requisitos de hardware    | CPU i7 / 16 GB RAM mín.        | CPU ou GPU leve                   |
+| Melhor uso                | Relatórios, análises completas | Dashboards e automação financeira |
+
+💡 **Dica:**
+Use o **Gemma 2 9B** para relatórios explicativos e
+o **FinGPT** para análises rápidas e estruturadas (via JSON).
+
+---
+
+# 🔗 5. Integração com APIs (dados reais)
+
+Você pode unir esses modelos a dados reais via Python:
+
+```python
+import requests, subprocess, json
+
+ticker = "PETR4"
+dados = requests.get(f"https://brapi.dev/api/quote/{ticker}").json()
+
+prompt = f"Analise fundamentalista do ativo {ticker} com base nesses dados:\n{json.dumps(dados, indent=2)}"
+
+result = subprocess.run(
+    ["ollama", "run", "analista-fundamentalista-gemma"],
+    input=prompt,
+    text=True,
+    capture_output=True
+)
+
+print(result.stdout)
+```
+
+Assim, o modelo analisa **dados reais atualizados**.
+
+---
+
+# 🧱 6. Boas práticas
+
+✅ Prefira `temperature 0.3–0.5` para consistência;
+✅ Teste prompts curtos (“PETR4 fundamentos”) e longos (“Analise PETR4 com foco em ROE e dívida líquida”);
+✅ Mantenha logs dos resultados para validar coerência;
+✅ Documente suas variações de Modelfile (v1, v2, etc).
+
+---
+
+# 🏁 7. Resumo final
+
+| Cenário                                   | Modelo ideal         | Comando                                      |
+| ----------------------------------------- | -------------------- | -------------------------------------------- |
+| Análises explicativas e linguagem natural | **Gemma 2 9B**       | `ollama run analista-fundamentalista-gemma`  |
+| Análises estruturadas com JSON            | **FinGPT (Mistral)** | `ollama run analista-fundamentalista-fingpt` |
+
+---
+
+Se quiser, posso gerar **os dois Modelfiles prontos + script Python completo** (com API da Brapi para dados de ações brasileiras) — formatado como um mini-projeto para rodar direto no WSL.
+Quer que eu monte esse pacote para você (com arquivos `.Modelfile`, `.py` e exemplo de saída)?
+
+
+
+
+> ollama ls
+NAME                  ID              SIZE      MODIFIED
+deepseek-r1:70b       d37b54d01a76    42 GB     4 weeks ago
+deepseek-r1:latest    6995872bfe4c    5.2 GB    6 weeks ago
+> ollama pull gemma2:9b
+pulling manifest
+pulling ff1d1fc78170:  27% ▕███████████████                                           ▏ 1.5 GB/5.4 GB   14 MB/s   4m34s
+
+
+ollama pull gemma2:9b
+
+
+
+
+
+> cd /home/fernando/cursos/ia-inteligencia-artificial/kodekloud-running-local-llms-with-ollama/modelo-customizado
+> ollama create analista-fundamentalista-gemma -f Modelfile
+gathering model components
+using existing layer sha256:ff1d1fc78170d787ee1201778e2dd65ea211654ca5fb7d69b5a2e7b123a50373
+using existing layer sha256:097a36493f718248845233af1d3fefe7a303f864fae13bc31a3a9704229378ca
+creating new layer sha256:87cd0771a511c1b2f2fb949937f06ecb6c33b5f2d8364285f476a34e9fafa52e
+creating new layer sha256:846f6ee8cf2c24d89e566964df738b9f28202cd5bfa6cec1f0cc92d88a39f441
+creating new layer sha256:619e1959902b73a513da9f715b9740056499aa57e5f75b5a87f419726aa0dced
+writing manifest
+success
