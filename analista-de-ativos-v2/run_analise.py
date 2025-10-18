@@ -4,6 +4,7 @@ import subprocess
 import sys
 
 from statusinvest_scrape import scrape_statusinvest_acao
+from statusinvest_requests import scrape_statusinvest_requests
 
 DEFAULT_MODEL = "analista-fundamentalista-gemma"
 
@@ -28,7 +29,11 @@ if __name__ == "__main__":
     ticker = sys.argv[1]
     model = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_MODEL
 
-    data = asyncio.run(scrape_statusinvest_acao(ticker))
+    try:
+        data = asyncio.run(scrape_statusinvest_acao(ticker))
+    except Exception as e:
+        print(f"[fallback] Playwright falhou: {e}\nUsando requests/bs4…")
+        data = scrape_statusinvest_requests(ticker)
     print(json.dumps(data, ensure_ascii=False, indent=2))
     print("\n================= RESPOSTA DO MODELO =================\n")
     print(run_ollama(model, data))

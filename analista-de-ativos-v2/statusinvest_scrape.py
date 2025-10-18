@@ -64,7 +64,7 @@ async def scrape_statusinvest_acao(ticker: str) -> Dict:
             locale="pt-BR"
         )
         page = await ctx.new_page()
-        await page.goto(url, wait_until="networkidle", timeout=60000)
+        await page.goto(url, wait_until="domcontentloaded", timeout=180000)
 
         # fechar cookies/banners se houver
         for sel in ["button:has-text('Aceitar')", "button:has-text('Fechar')", "button[aria-label*='fechar' i]"]:
