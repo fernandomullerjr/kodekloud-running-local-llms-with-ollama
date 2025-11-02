@@ -1879,6 +1879,23 @@ Sat Oct 18 19:24:42 -03 2025
 
 
 
+> git push --force-with-lease origin main
+Enumerating objects: 7603, done.
+Counting objects: 100% (7603/7603), done.
+Delta compression using up to 16 threads
+Compressing objects: 100% (6449/6449), done.
+Writing objects: 100% (7596/7596), 94.85 MiB | 5.36 MiB/s, done.
+Total 7596 (delta 1061), reused 7591 (delta 1056), pack-reused 0
+remote: Resolving deltas: 100% (1061/1061), completed with 5 local objects.
+remote: error: Trace: dcb8c0cc3a22e1cc150b1a0f34007d7f4bec40f610bc0aa4a34c1c66da3b25bd
+remote: error: See https://gh.io/lfs for more information.
+remote: error: File analista-de-ativos-v2/.venv/lib/python3.12/site-packages/playwright/driver/node is 115.98 MB; this exceeds GitHub's file size limit of 100.00 MB
+remote: error: GH001: Large files detected. You may want to try Git Large File Storage - https://git-lfs.github.com.
+To github.com:fernandomullerjr/kodekloud-running-local-llms-with-ollama.git
+
+
+
+
 ## PENDENTE
 
 Otimizar o analista de ativos v2. Fazer que busque mais dados do ativo, e que analise os dados de fato(não faça apenas comentários fixos).
