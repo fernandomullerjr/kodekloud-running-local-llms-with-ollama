@@ -1903,3 +1903,124 @@ Otimizar o analista de ativos v2. Fazer que busque mais dados do ativo, e que an
 Verificar como obter analise Qualitativa. Coletar da internet?
 
 Testar outros modelos para esta finalidade?
+
+
+
+
+
+
+
+## Dia 02/11/2025
+
+
+- ANTES:
+
+ ~/cursos/ia/kodekloud-running-local-llms-with-ollama/analista-de-ativos-v2  main                              
+> make scrape TICKER=BBAS3
+. .venv/bin/activate && python3 statusinvest_scrape.py BBAS3
+{
+  "ticker": "BBAS3",
+  "url": "https://statusinvest.com.br/acoes/bbas3",
+  "titulo": "BBAS3 - BANCO BRASIL",
+  "setor": null,
+  "indicadores": {
+    "P/L": 6.71,
+    "P/VP": 0.69,
+    "DY": 3.0,
+    "ROE": "10,31%",
+    "ROIC": null,
+    "Margem Líquida": null,
+    "Margem EBITDA": null,
+    "Crescimento Lucros": null,
+    "Dív. Líq/EBITDA": null,
+    "Payout": 5.0
+  }
+}
+> date
+Sun Nov  2 12:37:46 -03 2025
+
+ ~/cursos/ia/kodekloud-running-local-llms-with-ollama/analista-de-ativos-v2  main                              
+
+
+
+Vou modificar os scripts para capturar o histórico de Dividend Yield (DY) dos últimos 12 meses, além do DY médio dos últimos 5 e 10 anos.
+
+📊 Análise da Status Invest
+A Status Invest tem seções específicas para histórico de dividendos. Vamos capturar:
+
+DY últimos 12 meses (rolling)
+DY médio 5 anos
+DY médio 10 anos
+Histórico mensal de dividendos
+🔧 Modificações necessárias
+1. Atualizar statusinvest_scrape.py
+2. Atualizar statusinvest_requests.py (fallback)
+3. Atualizar Modelfile.gemma para analisar histórico de dividendos
+
+
+- Atualizando o modelo:
+
+~~~~dockerfile
+# Modelfile: analista-fundamentalista-gemma
+FROM gemma2:9b
+
+SYSTEM """
+Você é um analista fundamentalista de investimentos.
+Analise ações, FIIs e stocks com base em fundamentos econômicos e financeiros.
+Avalie múltiplos como P/L, P/VP, ROE, DY e histórico de dividendos.
+Considere especialmente:
+- Consistência no pagamento de dividendos
+- Evolução do DY ao longo do tempo
+- Sustentabilidade do payout
+- Comparação com médias históricas
+
+Classifique o ativo como 'Alta qualidade', 'Neutra' ou 'Baixa qualidade'.
+Não faça recomendações de compra/venda.
+"""
+
+PARAMETER temperature 0.4
+PARAMETER top_p 0.9
+PARAMETER num_predict 512
+
+TEMPLATE """
+Ativo: {{ .Prompt }}
+
+Responda com a estrutura:
+
+**Resumo do Ativo**
+**Indicadores Fundamentais**
+**Análise de Dividendos**
+- DY atual vs médias históricas
+- Consistência no pagamento
+- Tendência dos últimos 12 meses
+**Análise Qualitativa**
+**Classificação Final**
+"""
+~~~~
+
+
+> ollama ls
+NAME                                     ID              SIZE      MODIFIED
+analista-fundamentalista-gemma:latest    3f1e26a2a209    5.4 GB    2 weeks ago
+gemma2:9b                                ff02c3702f32    5.4 GB    2 weeks ago
+deepseek-r1:70b                          d37b54d01a76    42 GB     7 weeks ago
+deepseek-r1:latest                       6995872bfe4c    5.2 GB    2 months ago
+> ollama create analista-fundamentalista-gemma -f Modelfile.gemma
+gathering model components
+using existing layer sha256:ff1d1fc78170d787ee1201778e2dd65ea211654ca5fb7d69b5a2e7b123a50373
+using existing layer sha256:097a36493f718248845233af1d3fefe7a303f864fae13bc31a3a9704229378ca
+creating new layer sha256:6b2fa182fca833085f3b762982ee3945ccfa504025a6b5e5c35ffbd945f82c09
+creating new layer sha256:73689feac4bdd20d5f0e96d4e5e290a5dc28df54035797c8c681903450cec618
+using existing layer sha256:619e1959902b73a513da9f715b9740056499aa57e5f75b5a87f419726aa0dced
+writing manifest
+success
+> ollama ls
+NAME                                     ID              SIZE      MODIFIED
+analista-fundamentalista-gemma:latest    5c457971d2e7    5.4 GB    2 seconds ago
+gemma2:9b                                ff02c3702f32    5.4 GB    2 weeks ago
+deepseek-r1:70b                          d37b54d01a76    42 GB     7 weeks ago
+deepseek-r1:latest                       6995872bfe4c    5.2 GB    2 months ago
+> date
+Sun Nov  2 12:58:21 -03 2025
+
+ ~/cursos/ia/kodekloud-running-local-llms-with-ollama/analista-de-ativos-v2  main !4                         

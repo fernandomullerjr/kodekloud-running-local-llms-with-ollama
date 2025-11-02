@@ -20,6 +20,70 @@ def normalize_number(s):
     except:
         return None
 
+def scrape_dividend_history_requests(soup, ticker):
+    """Captura histórico de dividendos usando requests/BeautifulSoup"""
+    try:
+        dividend_data = {
+            "dy_12m": None,
+            "dy_medio_5a": None,
+            "dy_medio_10a": None,
+            "historico_12m": []
+        }
+        
+        # Procurar por textos com DY e períodos
+        text_content = soup.get_text().lower()
+        
+        # Regex para capturar DY com períodos
+        import re
+        
+        # DY 12 meses
+        dy_12m_match = re.search(r'dy.*12.*meses?.*?(\d+[,.]?\d*)', text_content)
+        if dy_12m_match:
+            dividend_data["dy_12m"] = float(dy_12m_match.group(1).replace(',', '.'))
+            
+        # DY médio 5 anos
+        dy_5a_match = re.search(r'dy.*5.*anos?.*?(\d+[,.]?\d*)', text_content)
+        if dy_5a_match:
+            dividend_data["dy_medio_5a"] = float(dy_5a_match.group(1).replace(',', '.'))
+            
+        # DY médio 10 anos
+        dy_10a_match = re.search(r'dy.*10.*anos?.*?(\d+[,.]?\d*)', text_content)
+        if dy_10a_match:
+            dividend_data["dy_medio_10a"] = float(dy_10a_match.group(1).replace(',', '.'))
+            
+        # Procurar tabelas de histórico
+        tables = soup.find_all('table')
+        for table in tables:
+            rows = table.find_all('tr')
+            for row in rows:
+                cells = row.find_all(['td', 'th'])
+                if len(cells) >= 2:
+                    cell_texts = [cell.get_text().strip() for cell in cells]
+                    
+                    # Procurar por datas (formato brasileiro)
+                    for i, text in enumerate(cell_texts):
+                        if re.match(r'\d{2}/\d{2}/\d{4}', text):
+                            # Tentar extrair valor da próxima célula
+                            if i + 1 < len(cell_texts):
+                                value_text = cell_texts[i + 1]
+                                value = extract_number_from_text(value_text)
+                                if value:
+                                    dividend_data["historico_12m"].append({
+                                        "data": text,
+                                        "valor": value
+                                    })
+                                    
+        return dividend_data
+        
+    except Exception as e:
+        print(f"Erro ao capturar dividendos via requests: {e}")
+        return {
+            "dy_12m": None,
+            "dy_medio_5a": None,
+            "dy_medio_10a": None,
+            "historico_12m": []
+        }
+
 def scrape_statusinvest_requests(ticker="bbas3"):
     url = f"https://statusinvest.com.br/acoes/{ticker.lower()}"
     r = requests.get(url, headers=HEADERS, timeout=30)
@@ -53,12 +117,18 @@ def scrape_statusinvest_requests(ticker="bbas3"):
                     break
         indicadores[key] = normalize_number(val) if val else None
 
-    return {
-        "ticker": ticker.upper(),
+    # Adicionar captura de dividendos
+    dividend_history = scrape_dividend_history_requests(soup, ticker)
+    
+    data = {
+        "ticker": ticker,
         "url": url,
         "titulo": titulo,
-        "indicadores": indicadores
+        "indicadores": indicadores,
+        "dividendos": dividend_history  # Nova seção
     }
+    
+    return data
 
 if __name__ == "__main__":
     import sys
