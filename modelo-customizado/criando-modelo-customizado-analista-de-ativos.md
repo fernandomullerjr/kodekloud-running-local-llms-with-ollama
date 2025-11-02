@@ -2024,3 +2024,304 @@ deepseek-r1:latest                       6995872bfe4c    5.2 GB    2 months ago
 Sun Nov  2 12:58:21 -03 2025
 
  ~/cursos/ia/kodekloud-running-local-llms-with-ollama/analista-de-ativos-v2  main !4                         
+
+
+
+- Não funcionou dentro do esperado
+trouxe dentro de indicadores o DY como 3.0, que é incorreto.
+Trouxe os Dividendos como null, além de outros campos como null.
+
+
+> make scrape TICKER=BBAS3
+. .venv/bin/activate && python3 statusinvest_scrape.py BBAS3
+{
+  "ticker": "BBAS3",
+  "url": "https://statusinvest.com.br/acoes/bbas3",
+  "titulo": "BBAS3 - BANCO BRASIL",
+  "setor": null,
+  "indicadores": {
+    "P/L": 6.71,
+    "P/VP": 0.69,
+    "DY": 3.0,
+    "ROE": "10,31%",
+    "ROIC": null,
+    "Margem Líquida": null,
+    "Margem EBITDA": null,
+    "Crescimento Lucros": null,
+    "Dív. Líq/EBITDA": null,
+    "Payout": 5.0
+  },
+  "dividendos": {
+    "dy_12m": null,
+    "dy_medio_5a": null,
+    "dy_medio_10a": null,
+    "historico_12m": []
+  }
+}
+> date
+Sun Nov  2 13:04:15 -03 2025
+
+ ~/cursos/ia/kodekloud-running-local-llms-with-ollama/analista-de-ativos-v2  main !4                          
+
+
+
+
+
+## 🧪 **Como testar**
+
+1. **Primeiro, execute o debug para entender a estrutura:**
+````bash
+cd /home/fernando/cursos/ia-inteligencia-artificial/kodekloud-running-local-llms-with-ollama/analista-de-ativos-v2
+python debug_statusinvest.py BBAS3
+````
+
+2. **Teste a versão melhorada:**
+````bash
+python statusinvest_scrape_v2.py BBAS3
+````
+
+3. **Se funcionar bem, substitua o arquivo original:**
+````bash
+cp statusinvest_scrape_v2.py statusinvest_scrape.py
+````
+
+A versão melhorada usa estratégias mais robustas para encontrar os dados na estrutura específica do Status Invest e deve capturar melhor os indicadores e dados de dividendos.
+
+
+
+make debug TICKER=BBAS3
+
+
+
+
+## 🎯 **Como usar na prática**
+
+### **1. Executar o debug**
+````bash
+# Usar o Makefile
+make debug TICKER=BBAS3
+
+# Ou diretamente
+cd /home/fernando/cursos/ia-inteligencia-artificial/kodekloud-running-local-llms-with-ollama/analista-de-ativos-v2
+. .venv/bin/activate && python debug_statusinvest.py BBAS3
+````
+
+### **2. O que acontece**
+- ✅ Browser abre e carrega a página
+- ✅ Script mostra progresso no terminal
+- ✅ Após 10 segundos, fecha automaticamente
+- ✅ Gera 2 arquivos: HTML + Screenshot
+
+### **3. Para parar manualmente**
+- **Durante execução**: `Ctrl+C` → Browser fica aberto para inspeção
+- **Fechar forçado**: `Ctrl+C` duas vezes
+
+### **4. Arquivos gerados**
+````bash
+# Verificar se foram criados
+ls -la debug_bbas3_*
+
+# Ver conteúdo do HTML (buscar indicadores)
+grep -i "p/l\|dy\|roe\|dividend" debug_bbas3_structure.html | head -10
+
+# Abrir screenshot para ver a página
+eog debug_bbas3_screenshot.png  # ou outro visualizador
+````
+
+## 📋 **Workflow completo**
+
+````bash
+# 1. Executar debug
+make debug TICKER=BBAS3
+
+# 2. Analisar output no terminal
+# (o script já mostra tudo organizado)
+
+# 3. Analisar HTML salvo
+grep -A5 -B5 "P/L\|DY\|ROE" debug_bbas3_structure.html
+
+# 4. Ver screenshot da página
+# (para entender layout visual)
+
+# 5. Com base na análise, ajustar o scraper
+# Usar as classes/estruturas encontradas
+````
+
+## 🔧 **Melhorias no Makefile**
+
+````makefile
+# ...existing code...
+
+# Debug para entender a estrutura (com timeout)
+debug:
+    @echo "🚀 Iniciando debug para $(TICKER)..."
+    . $(VENV)/bin/activate && timeout 120s $(PY) debug_statusinvest.py $(TICKER) || true
+    @echo "✅ Debug concluído! Verifique os arquivos debug_$(shell echo $(TICKER) | tr A-Z a-z)_*"
+
+# Analisar arquivos gerados pelo debug
+debug-analyze:
+    @echo "📊 Analisando arquivos do debug..."
+    @ls -la debug_$(shell echo $(TICKER) | tr A-Z a-z)_* 2>/dev/null || echo "❌ Nenhum arquivo de debug encontrado"
+    @echo "🔍 Procurando indicadores no HTML..."
+    @grep -i "p/l\|dy\|roe\|dividend\|payout" debug_$(shell echo $(TICKER) | tr A-Z a-z)_structure.html | head -10 2>/dev/null || echo "❌ HTML não encontrado"
+
+# ...existing code...
+````
+
+Agora o debug é muito mais claro e controlado, sempre gerando os arquivos necessários para análise!
+
+
+
+
+
+- Ajustado arquivo debug "debug_statusinvest.py"
+- Criando novo Makefile.
+
+
+
+>
+> make debug TICKER=BBAS3
+🚀 Iniciando debug para BBAS3...
+. .venv/bin/activate && timeout 120s python3 debug_statusinvest.py BBAS3 || true
+🚀 Iniciando debug para BBAS3
+🔗 URL: https://statusinvest.com.br/acoes/bbas3
+============================================================
+📥 Carregando página...
+
+❌ Erro durante o debug: Page.goto: Timeout 60000ms exceeded.
+Call log:
+  - navigating to "https://statusinvest.com.br/acoes/bbas3", waiting until "networkidle"
+
+⏱️ Tempo total: 62.77 segundos
+✅ Debug concluído! Verifique os arquivos debug_bbas3_*
+> date
+Sun Nov  2 13:31:52 -03 2025
+
+
+
+
+
+
+- Ajustando
+
+
+## 🧪 **Como usar agora**
+
+````bash
+# Debug padrão (60 segundos)
+make debug TICKER=BBAS3
+
+# Debug com timeout customizado
+make debug-timeout TICKER=BBAS3 TIMEOUT=30
+
+# Ou diretamente
+python debug_statusinvest.py BBAS3 45
+````
+
+## 🚀 **Principais melhorias**
+
+1. **Timeout global** usando `signal.alarm()`
+2. **Timeouts menores** para operações individuais
+3. **Fallback** se `domcontentloaded` falhar
+4. **Menos operações** para terminar mais rápido
+5. **Sempre salva** HTML e screenshot antes do timeout
+6. **Cancelamento limpo** do browser
+
+Agora o script **sempre respeitará** o timeout passado, independente do carregamento da página!
+
+
+
+
+- Testando:
+
+
+>
+> make debug TICKER=BBAS3
+🚀 Iniciando debug para BBAS3...
+. .venv/bin/activate && python3 debug_statusinvest.py BBAS3 60 || true
+🚀 Iniciando debug para BBAS3
+🔗 URL: https://statusinvest.com.br/acoes/bbas3
+⏰ Timeout máximo: 60 segundos
+============================================================
+📥 Carregando página...
+✅ Página carregada com domcontentloaded
+⏳ Aguardando carregamento AJAX...
+🔍 Analisando estrutura de: https://statusinvest.com.br/acoes/bbas3
+============================================================
+
+🏷️ TÍTULO DA PÁGINA:
+Título: BBAS3 - BANCO BRASIL ON: cotação e indicadores
+
+📊 SEÇÕES PRINCIPAIS:
+Encontradas 95 seções
+Seção  0: COTAÇÃO do BBAS3 help_outline 1 dia 5 dias...
+Seção  1: R$ arrow_upward % -...
+Seção  3: R$ arrow_upward % -...
+Seção  5: R$ arrow_upward % -...
+Seção  7: R$ arrow_upward % -...
+Seção  9: R$ arrow_upward % -...
+
+📈 ELEMENTOS COM NÚMEROS:
+Encontrados 158 elementos com números
+Número  0: '21,96' - Contexto: 'Valor atual R$ 21,96...'
+Número  1: '1,34%' - Contexto: 'arrow_upward 1,34%...'
+Número  2: '18,35' - Contexto: 'Min. 52 semanas R$ 18,35...'
+Número  3: 'R$ 20,33' - Contexto: 'Min. mês R$ 20,33...'
+Número  4: '29,30' - Contexto: 'Máx. 52 semanas R$ 29,30...'
+Número  5: 'R$ 21,96' - Contexto: 'Máx. mês R$ 21,96...'
+Número  6: '7,85' - Contexto: 'Dividend Yield help_outline 7,85 %...'
+Número  7: 'R$ 1,7249' - Contexto: 'Últimos 12 meses R$ 1,7249...'
+Número  8: '-9,48%' - Contexto: 'Valorização (12m) arrow_downward -9,48%...'
+Número  9: '0,18%' - Contexto: 'arrow_upward 0,18%...'
+Número 10: '13.77' - Contexto: 'hotel 13.77...'
+Número 11: '28.61' - Contexto: 'local_fire_department 28.61...'
+Número 12: '232.809.328,91' - Contexto: 'R$ 232.809.328,91...'
+Número 13: '2,772' - Contexto: '2,772 % arrow_forward...'
+Número 14: '1.000' - Contexto: '1.000 em aberto arrow_forward...'
+
+🎯 PROCURANDO INDICADORES ESPECÍFICOS:
+P/L: Encontrados 4 elementos
+  └─ 1: P/L format_quote 6,71 show_chart help_outline...
+P/VP: Encontrados 3 elementos
+  └─ 1: P/VP format_quote 0,69 show_chart help_outline...
+DY: Não encontrado
+ROE: Encontrados 4 elementos
+  └─ 1: ROE format_quote 10,31% show_chart help_outline...
+ROIC: Encontrados 4 elementos
+  └─ 1: ROIC format_quote -% show_chart help_outline...
+Margem: Encontrados 3 elementos
+  └─ 1: Margem Bruta - (%) format_quote show_chart...
+Payout: Encontrados 1 elementos
+  └─ 1: BETA help_outline PAYOUT DO BANCO BRASIL MÉDIA -...
+
+💾 Salvando HTML...
+✅ HTML salvo em: debug_bbas3_structure.html
+📊 Tamanho do arquivo: 1084676 caracteres
+
+📸 Capturando screenshot...
+✅ Screenshot salvo em: debug_bbas3_screenshot.png
+
+⏱️ Aguardando 3 segundos antes de fechar...
+🔄 Fechando browser...
+
+✅ DEBUG CONCLUÍDO!
+📁 Arquivos gerados:
+   - debug_bbas3_structure.html
+   - debug_bbas3_screenshot.png
+============================================================
+⏱️ Tempo total: 13.76 segundos
+✅ Debug concluído! Verifique os arquivos debug_bbas3_*
+>
+>
+>
+> date
+Sun Nov  2 13:44:40 -03 2025
+
+ ~/cursos/ia/kodekloud-running-local-llms-with-ollama/analista-de-ativos-v2  main !3 ?2    
+
+
+ 
+
+- Gerou HTML:
+
+/home/fernando/cursos/ia-inteligencia-artificial/kodekloud-running-local-llms-with-ollama/analista-de-ativos-v2/debug_bbas3_structure.html
